@@ -1,29 +1,25 @@
-.PHONY: build run stop clean
+image_name = beginning-web
+container_name = beginning-web
 
-# イメージ名とタグ
-IMAGE_NAME := beginning-web
-IMAGE_TAG := latest
-
-# コンテナ名
-CONTAINER_NAME := beginning-web
-
-# ホストとコンテナのポートマッピング
-HOST_PORT := 8443
-CONTAINER_PORT := 443
-
-# ホストとコンテナのディレクトリ同期
-HOST_DIR := $(shell pwd)/app
-CONTAINER_DIR := /var/www/html
-
+# dockerイメージのビルド
 build:
-	docker build -t $(IMAGE_NAME):$(IMAGE_TAG) .
+	docker build -t $(image_name) .
 
-run:
-	docker run -itd --name $(CONTAINER_NAME) -p $(HOST_PORT):$(CONTAINER_PORT) -v $(HOST_DIR):$(CONTAINER_DIR) $(IMAGE_NAME):$(IMAGE_TAG)
+# dockerコンテナの起動（初回）
+run: build
+	docker run -d --name $(container_name) -p 80:80 $(image_name)
 
+# dockerコンテナの起動（2回目以降）
+start:
+	docker start $(container_name)
+
+# dockerコンテナの停止
 stop:
-	docker stop $(CONTAINER_NAME)
-	docker rm $(CONTAINER_NAME)
+	docker stop $(container_name)
 
+# dockerコンテナ・イメージ・ボリュームの完全削除
 clean:
-	docker rmi $(IMAGE_NAME):$(IMAGE_TAG)
+	docker stop $(container_name) || true
+	docker rm $(container_name) || true
+	docker rmi $(image_name) || true
+	docker volume prune -f
