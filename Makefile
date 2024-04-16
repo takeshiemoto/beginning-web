@@ -7,7 +7,7 @@ build:
 
 # dockerコンテナの起動（初回）
 run: build
-	docker run -d --name $(container_name) -p 80:80 $(image_name)
+	docker run -d --name $(container_name) -p 8022:22 -p 80:80 -p 8433:443 $(image_name)
 
 # dockerコンテナの起動（2回目以降）
 start:
